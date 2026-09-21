@@ -49,7 +49,8 @@ class LinearRegressionModel(object):
         """
 
         # --- TO-DO block: Compute the model output y
-        pass
+        #pass
+        y = x @ self.w + self.b
         # --- End of TO-DO block
 
         return y
