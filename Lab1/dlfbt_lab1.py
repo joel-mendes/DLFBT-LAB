@@ -78,7 +78,13 @@ class LinearRegressionModel(object):
         y = self.predict(x)
 
         # --- TO-DO block: Compute the gradients db and dw
-        pass
+        N = x.shape[0]
+        error = y - t
+        
+        #L = 1/(2*N) * sum((y - t)**2)
+
+        db = np.mean(error, axis=0, keepdims=True)
+        dw = x.T @ error / N
         # --- End of TO-DO block
 
         return db, dw
@@ -100,6 +106,7 @@ class LinearRegressionModel(object):
         db, dw = self.compute_gradients(x, t)
 
         # --- TO-DO block: Update the model parameters b and w
+
         pass
         # --- End of TO-DO block
 
