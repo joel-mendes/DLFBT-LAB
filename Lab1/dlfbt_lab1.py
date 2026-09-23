@@ -80,7 +80,7 @@ class LinearRegressionModel(object):
         # --- TO-DO block: Compute the gradients db and dw
         N = x.shape[0]
         error = y - t
-        
+
         #L = 1/(2*N) * sum((y - t)**2)
 
         db = np.mean(error, axis=0, keepdims=True)
@@ -106,8 +106,11 @@ class LinearRegressionModel(object):
         db, dw = self.compute_gradients(x, t)
 
         # --- TO-DO block: Update the model parameters b and w
+        self.w = self.w - np.multiply(dw, eta)
+        self.b = self.b - np.multiply(db, eta)
 
-        pass
+        return self.w, self.b
+
         # --- End of TO-DO block
 
     def fit(self, x, t, eta, num_iters):
