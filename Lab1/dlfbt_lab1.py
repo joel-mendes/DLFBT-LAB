@@ -183,6 +183,7 @@ class LogisticRegressionModel(LinearRegressionModel):
     def __init__(self, d=2):
         LinearRegressionModel.__init__(self, d)
 
+    @staticmethod
     def sigmoid(z):
         """
         Calculates the sigmoid function on input z, element-wise
@@ -199,9 +200,41 @@ class LogisticRegressionModel(LinearRegressionModel):
         """
         return 1.0 / (1.0 + np.exp(-z))
 
-    # --- TO-DO block: Overwrite the methods of the LinearRegressionModel class
-    pass
-    # --- End of TO-DO block
+    # --- TO-DO block: Overwrite the methods of the LinearRegressionModel class"""
+    """class DataGeneratorLogistic1D(DataGeneratorLinear1D):
+    def __init__(self, a=2.0, b=-10.0):
+        DataGeneratorLinear1D.__init__(self, a, b)
+
+    def create_dataset(self, xmin=0.0, xmax=10.0, n=1000, seed=None):
+        DataGeneratorLinear1D.create_dataset(self, xmin, xmax, 0.0, n, seed)
+        self.t = sigmoid(self.t) > np.random.rand(n, 1)
+        self.modely = sigmoid(self.modely)"""
+
+    def predict(self, x):
+        """
+        Predicts output y for input batch x
+
+        Parameters
+        ----------
+        x : array
+            Input batch of shape (N, d), where N is the number of patterns and
+            d is the dimension
+
+        Returns
+        -------
+        y : array
+            Ouput batch of shape (N, 1) which is the result of applying the
+            logistic regression model to the input x
+        """
+
+        # --- TO-DO block: Compute the model output y
+        #pass
+        # linear: y = x @ self.w + self.b
+        z = x @ self.w + self.b
+        y = self.sigmoid(z)
+        # --- End of TO-DO block
+
+        return y
 
     def get_loss(self, x, t):
         """
@@ -253,7 +286,10 @@ class BasicTF:
 
         # --- TO-DO block: Define the computational graph within a gradient tape and
         # --- compute the gradient
-        pass
+        with tf.GradientTape() as tape:
+            y = f(x) # Note that a is interpreted as a contant tensor
+
+        dy_dx = tape.gradient(y, x)
         # --- End of TO-DO block
 
         return dy_dx
