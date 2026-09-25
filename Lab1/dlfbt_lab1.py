@@ -2,8 +2,8 @@
 # DLFBT 2026/2027
 # Lab assignment 1
 # Authors:
-#   Name1 NIA1 (complete your name and NIA here)
-#   Name2 NIA2 (complete your name and NIA here)
+#   Joel Mendes 566102 (complete your name and NIA here)
+#   Hugo Vaz Calvo 578390 (complete your name and NIA here)
 # ===============================================================================
 
 import numpy as np
