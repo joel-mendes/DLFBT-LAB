@@ -2,11 +2,9 @@
 # DLFBT 2026/2027
 # Lab assignment 1
 # Authors:
-#   Joel Mendes 566102 (complete your name and NIA here)
-#   Hugo Vaz Calvo 578390 (complete your name and NIA here)
+#   Name1 NIA1 (complete your name and NIA here)
+#   Name2 NIA2 (complete your name and NIA here)
 # ===============================================================================
-
-# alteracao exemplo
 
 import numpy as np
 import tensorflow as tf
