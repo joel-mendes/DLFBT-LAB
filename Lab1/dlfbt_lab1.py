@@ -6,6 +6,8 @@
 #   Hugo Vaz Calvo 578390 (complete your name and NIA here)
 # ===============================================================================
 
+# alteracao exemplo
+
 import numpy as np
 import tensorflow as tf
 
