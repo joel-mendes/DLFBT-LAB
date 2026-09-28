@@ -2,8 +2,8 @@
 # DLFBT 2026/2027
 # Lab assignment 1
 # Authors:
-#   Joel Mendes 566102 (complete your name and NIA here)
-#   Hugo Vaz Calvo 578390 (complete your name and NIA here)
+#   Name1 NIA1 (complete your name and NIA here)
+#   Name2 NIA2 (complete your name and NIA here)
 # ===============================================================================
 
 import numpy as np
@@ -47,9 +47,9 @@ class LinearRegressionModel(object):
             Ouput batch of shape (N, 1) which is the result of applying the
             linear regression model to the input x
         """
-
+        
         # --- TO-DO block: Compute the model output y
-        #pass
+        # --- pass
         y = x @ self.w + self.b
         # --- End of TO-DO block
 
@@ -78,12 +78,14 @@ class LinearRegressionModel(object):
         y = self.predict(x)
 
         # --- TO-DO block: Compute the gradients db and dw
+        # --- pass
         N = x.shape[0]
-        error = y - t
+        # --- L = np.dot((0.5 * N), np.sum((np.add(y,-t))**2))
+        # --- loss = 0.5 * np.mean((y - t) ** 2)
+        E = (y - t)
+        db = np.mean(E, axis=0, keepdims=True)
+        dw = x.T @ E/N
 
-        #L = 1/(2*N) * sum((y - t)**2)
-        db = np.mean(error, axis=0, keepdims=True)
-        dw = x.T @ error / N
         # --- End of TO-DO block
 
         return db, dw
@@ -105,11 +107,11 @@ class LinearRegressionModel(object):
         db, dw = self.compute_gradients(x, t)
 
         # --- TO-DO block: Update the model parameters b and w
+        # --- pass
         self.w = self.w - np.multiply(dw, eta)
         self.b = self.b - np.multiply(db, eta)
 
         return self.w, self.b
-
         # --- End of TO-DO block
 
     def fit(self, x, t, eta, num_iters):
@@ -182,7 +184,6 @@ class LogisticRegressionModel(LinearRegressionModel):
     def __init__(self, d=2):
         LinearRegressionModel.__init__(self, d)
 
-    @staticmethod
     def sigmoid(z):
         """
         Calculates the sigmoid function on input z, element-wise
@@ -199,41 +200,19 @@ class LogisticRegressionModel(LinearRegressionModel):
         """
         return 1.0 / (1.0 + np.exp(-z))
 
-    # --- TO-DO block: Overwrite the methods of the LinearRegressionModel class"""
-    """class DataGeneratorLogistic1D(DataGeneratorLinear1D):
-    def __init__(self, a=2.0, b=-10.0):
-        DataGeneratorLinear1D.__init__(self, a, b)
-
-    def create_dataset(self, xmin=0.0, xmax=10.0, n=1000, seed=None):
-        DataGeneratorLinear1D.create_dataset(self, xmin, xmax, 0.0, n, seed)
-        self.t = sigmoid(self.t) > np.random.rand(n, 1)
-        self.modely = sigmoid(self.modely)"""
-
+    # --- TO-DO block: Overwrite the methods of the LinearRegressionModel class
+    # ---- pass
     def predict(self, x):
-        """
-        Predicts output y for input batch x
-
-        Parameters
-        ----------
-        x : array
-            Input batch of shape (N, d), where N is the number of patterns and
-            d is the dimension
-
-        Returns
-        -------
-        y : array
-            Ouput batch of shape (N, 1) which is the result of applying the
-            logistic regression model to the input x
-        """
-
-        # --- TO-DO block: Compute the model output y
-        #pass
-        # linear: y = x @ self.w + self.b
         z = x @ self.w + self.b
         y = self.sigmoid(z)
-        # --- End of TO-DO block
-
         return y
+
+    def compute_gradients(self, x, t):
+        LinearRegressionModel.compute_gradients(self, x, t)
+
+    def gradient_step(self, x, t, eta):
+        LinearRegressionModel.gradient_step(self, x, t, eta)
+    # --- End of TO-DO block
 
     def get_loss(self, x, t):
         """
@@ -279,16 +258,16 @@ class BasicTF:
         Returns
         -------
         dy_dx : array
-            Array with the same shape as x with the derivative
+        Array with the same shape as x with the derivative
         """
-        x = tf.Variable(x)
-
+        # ---x = tf.Variable(x)
+        x = tf.Variable(x0, dtype=tf.float64)
+        with tf.GradientTape() as tape:
+            y = f(x)
+        dy_dx = tape.gradient(y, x)
         # --- TO-DO block: Define the computational graph within a gradient tape and
         # --- compute the gradient
-        with tf.GradientTape() as tape:
-            y = f(x) # Note that a is interpreted as a contant tensor
-
-        dy_dx = tape.gradient(y, x)
+       
         # --- End of TO-DO block
 
         return dy_dx
@@ -317,22 +296,19 @@ class BasicTF:
         x = tf.Variable(x0)
 
         x_history = []
-        x_history.append(x0)
-
         for i in range(niters):
             # --- TO-DO block: Define the computational graph within a gradient tape and
             # --- compute the gradient
-            #dy_dx = differentiate(f, x)
             with tf.GradientTape() as tape:
-                y = f(x) # Note that a is interpreted as a contant tensor
+                y = f(x)
             dy_dx = tape.gradient(y, x)
             # --- End of TO-DO block
 
             # --- TO-DO block: Update the value of x using the tf.Variable assign method
-            x.assign(x - dy_dx * eta)
+            x.assign_sub(eta * dy_dx)
             # --- End of TO-DO block
 
-            x_history.append(x.numpy()) 
+            x_history.append(x.numpy())
 
         xvals = np.array(x_history)
 
@@ -378,7 +354,6 @@ class LinearRegressionModel_TF(object):
 
         """
         # --- TO-DO block: Compute the model output y
-        #y = x @ self.w + self.b
         y = tf.matmul(x, self.w) + self.b
         # --- End of TO-DO block
 
@@ -405,12 +380,11 @@ class LinearRegressionModel_TF(object):
              Gradient of the loss with respect to the weights, shape (d, 1)
         """
         # --- TO-DO block: Compute the gradients db and dw of the loss function
-        with tf.GradientTape(persistent=True) as tape:
+        with tf.GradientTape() as tape:
             y = self.predict(x)
-            L = tf.reduce_mean(tf.square(y - t)) / 2
 
-        db = tape.gradient(L, self.b)
-        dw = tape.gradient(L, self.w)
+        loss = tf.reduce_mean(tf.square(y - t))
+        db, dw = tape.gradient(loss, [self.b, self.w])
         # --- End of TO-DO block
 
         return db, dw
@@ -432,8 +406,7 @@ class LinearRegressionModel_TF(object):
         db, dw = self.compute_gradients(x, t)
 
         # --- TO-DO block: Update the model parameters b and w
-        self.b.assign(self.b - eta*db)
-        self.w.assign(self.w - eta*dw)
+        pass
         # --- End of TO-DO block
 
     def fit(self, x, t, eta, num_iters):
@@ -609,13 +582,7 @@ class NeuralNetwork(object):
         y = []
         # --- TO-DO block: loop in the network layers computing both the pre-
         # --- activation and the activation and appending them to lists z and y.
-
-        for i in range(self.nlayers):
-            z_i = self.W[i] @ x + self.b[i]
-            y_i = self.a[i](z_i)
-            z.append(z_i)
-            y.append(y_i)
-            x = y_i
+        pass
         # --- End of TO-DO block
 
         return z, y
@@ -661,14 +628,7 @@ class NeuralNetwork(object):
         # --- TO-DO block: loop in the network layers computing the gradients with
         # --- respect to W and b. Note that the gradients must be computed starting
         # --- by the last layer, it may be useful to traverse the lists backwards.
-        for i in range(self.nlayers - 1, -1, -1):
-            dz = dy * self.da[i](z[i])
-            dW_i = dz @ y[i-1].T if i > 0 else dz @ x.T
-            db_i = np.sum(dz, axis=1, keepdims=True)
-            dy = self.W[i].T @ dz
-            
-            dW.insert(0, dW_i)
-            db.insert(0, db_i)
+        pass
         # --- End of TO-DO block
 
         return dW, db
@@ -690,9 +650,7 @@ class NeuralNetwork(object):
         dW, db = self.compute_gradients(x, t)
 
         # --- TO-DO block: Loop in layers updating the model parameters b and w
-        for i in range(self.nlayers):
-            self.W[i] = self.W[i]- dW[i]*eta
-            self.b[i] = self.b[i] - db[i]*eta
+        pass
         # --- End of TO-DO block
 
     def fit(self, x, t, eta, num_epochs, batch_size, loss_function):
@@ -846,10 +804,7 @@ class NeuralNetwork_TF(object):
         # --- TO-DO block: loop in the network layers computing the activations.
         # --- The activation of the last layer should be stored at variable y to
         # --- be returned.
-        y = x
-        for l in range(self.nlayers):
-            z = tf.matmul(self.W[l], y) + self.b[l]
-            y = self.a[l](z)
+        pass
         # --- End of TO-DO block
 
         return y
@@ -880,10 +835,7 @@ class NeuralNetwork_TF(object):
             the weights of each layer, for input batch x.
         """
         # --- TO-DO block: compute the gradients db, dW using the gradient tape
-        with tf.GradientTape() as tape:
-            y = self.predict(x)
-            loss = loss_function(y, t)
-        db, dW = tape.gradient(loss, [self.b, self.W])
+        pass
         # --- End of TO-DO block
 
         return db, dW
@@ -910,9 +862,7 @@ class NeuralNetwork_TF(object):
         dB, dW = self.compute_gradients(x, t, loss_function)
 
         # --- TO-DO block: Loop in layers updating the model parameters b and w
-        for l in range(self.nlayers):
-            self.b[l].assign_sub(dB[l]*eta)
-            self.W[l].assign_sub(dW[l]*eta)
+        pass
         # --- End of TO-DO block
 
     def fit(self, x, t, eta, num_epochs, batch_size, loss_function):
