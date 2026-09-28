@@ -48,15 +48,16 @@ def load_phoneme():
     """
 
     # TODO: load the CSV.
-    # dataset = 
+    dataset = np.loadtxt("../data/lab2/phoneme.csv", delimiter=',')
 
     # TODO: perform a shape / validity check.
+    print(dataset.shape)
 
     # TODO:
-    # X = ...
-    # y = ...
-
-    raise NotImplementedError("TODO: implement load_phoneme")
+    X = dataset[:, :-1]
+    y = dataset[:, -1]
+    
+    return X, y
 
 
 def dataset_overview(X, y):
@@ -80,7 +81,7 @@ class DataSplit:
     y_val: np.ndarray
     y_test: np.ndarray
 
-    scaler: Optional[StandardScaler]
+    scaler: Optional[StandardScaler] = None
 
 
 def prepare_data(
@@ -128,19 +129,43 @@ def prepare_data(
     Implement the full preprocessing pipeline.
     """
 
+    n = len(X)
     # TODO: validate test_size and val_size.
+    n_test_size = n * test_size
+    n_val_size = n * val_size
+    print(n_val_size, n_test_size)
 
     # TODO: first split -> train+validation and test.
+    train_val_size = 1 - test_size
+    X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
     # TODO: compute the validation fraction relative to train+validation.
-
+    val_relative_size = val_size / train_val_size
+    
     # TODO: second split -> train and validation.
+    X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=val_relative_size, random_state=random_state)
 
     # TODO: optionally fit StandardScaler ONLY on X_train.
+    if normalize:
+        scaler = StandardScaler()
+        scaler.fit(X_train)
+        X_train = scaler.transform(X_train)
+        #X_val = scaler.transform(X_val)
+        #X_test = scaler.transform(X_test)
+
 
     # TODO: return DataSplit(...)
 
-    raise NotImplementedError("TODO: implement prepare_data")
+    return DataSplit(
+        X_train=X_train,
+        X_val=X_val,
+        X_test=X_test,
+        y_train=y_train,
+        y_val=y_val,
+        y_test=y_test,
+        scaler=scaler,
+    )
+
 
 
 def build_baseline_model(input_dim, hidden_units=8):
