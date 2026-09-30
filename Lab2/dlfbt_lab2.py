@@ -137,13 +137,13 @@ def prepare_data(
 
     # TODO: first split -> train+validation and test.
     train_val_size = 1 - test_size
-    X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=test_size, stratify=y, random_state=random_state)
 
     # TODO: compute the validation fraction relative to train+validation.
     val_relative_size = val_size / train_val_size
     
     # TODO: second split -> train and validation.
-    X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=val_relative_size, random_state=random_state)
+    X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=val_relative_size, stratify=y_train_val, random_state=random_state)
 
     # TODO: optionally fit StandardScaler ONLY on X_train.
     if normalize:
@@ -188,9 +188,13 @@ def build_baseline_model(input_dim, hidden_units=8):
     """
 
     # TODO:
-    # model = tf.keras.Sequential([...])
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(input_dim,)),
+        tf.keras.layers.Dense(hidden_units, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid")
+    ])
 
-    raise NotImplementedError("TODO: implement build_baseline_model")
+    return model 
 
 
 def compile_binary_model(
@@ -226,14 +230,21 @@ def compile_binary_model(
     # TODO:
     # If optimizer is a string AND learning_rate is provided,
     # create the appropriate tf.keras.optimizers.* object.
-
+    if isinstance(optimizer, str) and learning_rate:
+        optimizers_map = {
+            "sgd": tf.keras.optimizers.SGD,
+            "adagrad": tf.keras.optimizers.Adagrad,
+            "rmsprop": tf.keras.optimizers.RMSprop,
+            "adam": tf.keras.optimizers.Adam
+            }
+        optimizer_instance = optimizers_map[optimizer.lower()](learning_rate=learning_rate)
+    
     # TODO:
-    # model.compile(
-    #
-    # )
-
-    raise NotImplementedError("TODO: implement compile_binary_model")
-
+    model.compile(
+            optimizer = optimizer_instance,
+            loss = "binary_crossentropy"
+        )
+    
 
 def make_early_stopping(patience=20):
     return tf.keras.callbacks.EarlyStopping(
@@ -282,7 +293,7 @@ def train_model(
     """
 
     # TODO:
-    # history = model.fit(...)
+    history = model.fit()
 
     raise NotImplementedError("TODO: implement train_model")
 
