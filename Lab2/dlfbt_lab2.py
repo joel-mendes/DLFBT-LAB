@@ -242,7 +242,8 @@ def compile_binary_model(
     # TODO:
     model.compile(
             optimizer = optimizer_instance,
-            loss = "binary_crossentropy"
+            loss = "binary_crossentropy",
+            metrics = ["accuracy"]
         )
     
 
@@ -293,9 +294,17 @@ def train_model(
     """
 
     # TODO:
-    history = model.fit()
+    history = model.fit(
+        x = split.X_train, 
+        y = split.y_train,
+        validation_data = (split.X_val, split.y_val),
+        epochs=epochs,
+        batch_size=batch_size,
+        callbacks=make_early_stopping(patience),
+        verbose=verbose
+        )
 
-    raise NotImplementedError("TODO: implement train_model")
+    return history
 
 
 def evaluate_model(model, split):
@@ -317,9 +326,9 @@ def evaluate_model(model, split):
     """
 
     # TODO:
-    # loss, accuracy = model.evaluate(...)
-
-    raise NotImplementedError("TODO: implement evaluate_model")
+    loss, accuracy = model.evaluate(x = split.X_test,y = split.y_test)
+    
+    return {"test_loss": loss, "test_accuracy": accuracy}
 
 
 def build_improved_model(input_dim):
