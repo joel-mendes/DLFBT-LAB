@@ -354,10 +354,19 @@ def build_improved_model(input_dim):
     """
 
     # TODO: build the architecture.
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(input_dim,)),
+        tf.keras.layers.Dense(32, activation="relu"),
+        tf.keras.layers.Dropout(0.15),
+        tf.keras.layers.Dense(16, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid"),
+    ])
 
     # TODO: compile it, preferably by reusing compile_binary_model(...).
+    compile_binary_model(model=model, optimizer="adam", learning_rate=1e-3)
 
-    raise NotImplementedError("TODO: implement build_improved_model")
+    return model 
+    #raise NotImplementedError("TODO: implement build_improved_model")
 
 
 def build_regularized_model(input_dim, l2_strength=1e-4):
@@ -380,11 +389,19 @@ def build_regularized_model(input_dim, l2_strength=1e-4):
     """
 
     # TODO:
-    # reg = tf.keras.regularizers.l2(...)
+    reg = tf.keras.regularizers.l2(l2_strength)
 
     # TODO: build and return the Sequential model.
 
-    raise NotImplementedError("TODO: implement build_regularized_model")
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(input_dim,)),
+        tf.keras.layers.Dense(32, activation="relu", kernel_regularizer=reg),
+        tf.keras.layers.Dense(16, activation="relu", kernel_regularizer=reg),
+        tf.keras.layers.Dense(1, activation="sigmoid"),
+    ])
+
+    #raise NotImplementedError("TODO: implement build_regularized_model")
+    return model 
 
 
 def build_dropout_model(input_dim, rate=0.25):
@@ -408,8 +425,16 @@ def build_dropout_model(input_dim, rate=0.25):
     """
 
     # TODO: build and return the Sequential model.
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(input_dim,)),
+        tf.keras.layers.Dense(32, activation="relu"),
+        tf.keras.layers.Dropout(rate),
+        tf.keras.layers.Dense(16, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid"),
+    ])
 
-    raise NotImplementedError("TODO: implement build_dropout_model")
+    #raise NotImplementedError("TODO: implement build_dropout_model")
+    return model
 
 
 def optimizer_from_name(name, learning_rate=1e-3):
@@ -454,8 +479,24 @@ def optimizer_from_name(name, learning_rate=1e-3):
     """
 
     # TODO: return the matching tf.keras.optimizers optimizer.
-
-    raise NotImplementedError("TODO: implement optimizer_from_name")
+    name = name.lower().replace(" ", "").replace("-", "")
+    
+    optimizers_map = {
+        "sgd": (tf.keras.optimizers.SGD, {}),
+        "momentum": (tf.keras.optimizers.SGD, {"momentum": 0.9}),
+        "nesterov": (tf.keras.optimizers.SGD, {"momentum": 0.9, "nesterov": True}),
+        "adagrad": (tf.keras.optimizers.Adagrad, {}),
+        "rmsprop": (tf.keras.optimizers.RMSprop, {}),
+        "adam": (tf.keras.optimizers.Adam, {}),
+    }
+    
+    if name not in optimizers_map:
+        raise ValueError(f"Unknown optimizer: {name}")
+    
+    optimizer_class, kwargs = optimizers_map[name]
+    #raise NotImplementedError("TODO: implement optimizer_from_name")
+    
+    return optimizer_class(learning_rate=learning_rate, **kwargs)
 
 
 def run_optimizer_experiment(
