@@ -508,6 +508,7 @@ def run_optimizer_experiment(
     learning_rate=1e-3,
     patience=15,
     seed=RANDOM_STATE,
+    verbose=0,
 ):
     """
     Train ONE optimizer under controlled conditions.
@@ -525,7 +526,6 @@ def run_optimizer_experiment(
 
 
     The notebook expects:
-
         "optimizer"
         "epochs_run"
         "seconds"
@@ -540,24 +540,68 @@ def run_optimizer_experiment(
     """
 
     # TODO: make the run reproducible.
+    set_reproducible(seed)
 
     # TODO: build model.
+    input_dim = split.X_train.shape[1]
+    hidden_units = 8
+
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(input_dim,)),
+        tf.keras.layers.Dense(hidden_units, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid")
+    ])
+
+    """model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(input_dim,)),
+        tf.keras.layers.Dense(258, activation="relu"),
+        tf.keras.layers.Dense(128, activation="relu"),
+        tf.keras.layers.Dense(64, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid"),
+    ])"""
 
     # TODO: construct optimizer.
+    optimizer_instance = optimizer_from_name(optimizer_name, learning_rate)
 
     # TODO: compile model.
+    model.compile(
+        optimizer = optimizer_instance, 
+        loss = "binary_crossentropy",
+        metrics = ["accuracy"]
+    )
 
     # TODO: record start time.
+    start_time = perf_counter()
 
     # TODO: train.
+    history = model.fit(
+        x = split.X_train,
+        y = split.y_train,
+        validation_data = (split.X_val, split.y_val),
+        epochs=epochs,
+        batch_size=batch_size,
+        callbacks = make_early_stopping(patience=patience),
+        verbose=verbose,
+    )
 
     # TODO: compute elapsed time.
+    elapsed_time = perf_counter() - start_time
 
     # TODO: evaluate.
+    loss, accuracy = model.evaluate(x = split.X_test,y = split.y_test)
 
     # TODO: return the result dictionary.
-
-    raise NotImplementedError("TODO: implement run_optimizer_experiment")
+    result = {
+        "optimizer": optimizer_name,
+        "epochs_run": len(history.history["loss"]),
+        "seconds": elapsed_time,
+        "test_loss": loss,
+        "test_accuracy": accuracy,
+        "history": history,
+        "model": model,
+    }
+    
+    return result
 
 
 def compare_optimizers(
@@ -595,9 +639,11 @@ def compare_optimizers(
     """
 
     # TODO: call run_optimizer_experiment once per optimizer name.
+    result = []
+    for name in names:
+        result.append(run_optimizer_experiment(split = split,optimizer_name = name,**kwargs))
 
-    raise NotImplementedError("TODO: implement compare_optimizers")
-
+    return result
 
 def available_devices():
     return {
