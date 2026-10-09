@@ -155,7 +155,6 @@ def prepare_data(
 
 
     # TODO: return DataSplit(...)
-
     return DataSplit(
         X_train=X_train,
         X_val=X_val,
@@ -302,7 +301,7 @@ def train_model(
         batch_size=batch_size,
         callbacks=make_early_stopping(patience),
         verbose=verbose
-        )
+    )
 
     return history
 
