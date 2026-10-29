@@ -57,7 +57,7 @@ def fit(
     patience=8,
     seed=42,
     device=None,
-    verbose=False
+    verbose=False   
 ):
     # X_* are already scaled numpy arrays and y_* are integer labels (done in the notebook)
     set_seed(seed)
