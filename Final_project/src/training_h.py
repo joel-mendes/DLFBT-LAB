@@ -7,14 +7,13 @@ def fit(*args, **kwargs):
 import time # once completed put the import time in the main and delete this one
 # so its not loading everytime 
 
-def fit(model, X_train, y_train, X_val, y_val, epochs=5):
+def fit(model, X_train, y_train, X_val, y_val, **kwargs):
     start = time.time()
     history = model.fit(
         X_train,
         y_train,
         validation_data=(X_val, y_val),
-        epochs=epochs,
-        batch_size=32,
+        **kwargs
     )
     training_time = time.time() - start
     return {

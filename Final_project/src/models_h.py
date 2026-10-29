@@ -1,30 +1,24 @@
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras import layers
 from keras.models import Sequential, Model
 from keras.layers import Flatten, Dense, LSTM, GRU, SimpleRNN
 from keras.layers import RepeatVector, Input
 
 
-class DNNClassifier:
+class DNNClassifier(keras.Sequential):
     def __init__(self, sequence_length, n_features, n_classes):
-        self.sequence_length = sequence_length
-        self.input_size = n_features
-        self.num_classes = n_classes
-        
-        model = keras.Sequential([
-            keras.layers.Input(shape=(self.input_size,)),
-            keras.layers.Dense(64, activation="relu"),
-            keras.layers.BatchNormalization(),
-            
-            keras.layers.Dense(self.num_classes, activation="softmax"),
+        super().__init__([
+            layers.Input(shape=(n_features,)),
+            layers.Dense(64, activation="relu"),
+            layers.BatchNormalization(),
+            layers.Dense(n_classes, activation="softmax"),
         ])
-    
-        model.compile(
-            optimizer=keras.optimizers.Adam(learning_rate=0.01),
+        self.compile(
+            optimizer=keras.optimizers.Adam(0.01),
             loss="sparse_categorical_crossentropy",
             metrics=["accuracy"],
-        )
-        self.model = model
+        )       
 
 
 class RNNClassifier:
